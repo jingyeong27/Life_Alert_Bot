@@ -14,6 +14,11 @@ def _day():
     day_result = info_day[0].string
     return day_result       # 일일 확진자수 결과를 return
 
+def _avg():
+    code_avg = req.urlopen(Corona_url)
+    soup = BeautifulSoup(code_avg, "html.parser")
+    info_avg = soup.select_one('#content > div > div:nth-child(14) > table > tbody > tr:nth-child(1) > td:nth-child(9)')
+    return info_avg.string      # 7일 평균 확진자수 결과를 return
 
 token = os.environ.get('token',"5322770624:AAGDUuFm7k50OHxwzfif3SqJuWv3dAN7GVc")    # 토큰 넣기
 id = 5316579447                   # chat_id
@@ -37,6 +42,9 @@ def handler(update, context):
         covid_num = _day()
         bot.send_message(chat_id=id, text="오늘 확진자 수 : {} 명".format(covid_num))
 
+    elif (user_text == "평균확진자"):    #평균 확진자수 '평균확진자'를 입력시 웹크롤링
+        covid_avg = _avg()
+        bot.send_message(chat_id=id, text = "7일 평균 확진자 수 : {} 명".format(covid_avg))
 
 
 echo_handler = MessageHandler(Filters.text, handler)
