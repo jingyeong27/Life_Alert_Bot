@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import os
 
 Corona_url = 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=11&ncvContSeq=&contSeq=&board_id=&gubun='
+Corona_url1= 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13&ncvContSeq=&contSeq=&board_id=&gubun='
 
 def _day():
     code = req.urlopen(Corona_url)
@@ -20,14 +21,22 @@ def _avg():
     info_avg = soup.select_one('#content > div > div:nth-child(14) > table > tbody > tr:nth-child(1) > td:nth-child(9)')
     return info_avg.string      # 7일 평균 확진자수 결과를 return
 
-token = os.environ.get('token',"5322770624:AAGDUuFm7k50OHxwzfif3SqJuWv3dAN7GVc")    # 토큰 넣기
-id = 5316579447                   # chat_id
+def _total():
+    code_total = req.urlopen(Corona_url1)
+    soup = BeautifulSoup(code_total, "html.parser")
+    info_total = soup.select_one('.total > li:nth-child(5) > div:nth-child(2) > span:nth-child(1)')
+    return info_total.string
+
+token = os.environ.get('token',"5396200298:AAEhrqPUg_VX5UoRzuImCNoyhDE_i4nLgKQ")    # 토큰 넣기
+id = 5054586086                   # chat_id
 bot = telegram.Bot(token)
 
 info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n'\
                '* 필요한 정보를 입력해주세요.\n'\
-               '* 코로나  : 일일 코로나 확진자 수 * \n' \
-                '* 평균확진자  : 7일 평균 확진자 수 *'
+               '* 코로나  : 일일 코로나 확진자 수 \n' \
+               '* 평균확진자  : 7일 평균 확진자 수 \n' \
+               '* 누적확진자 : 현재까지의 누적 확진자 수'
+
 
 
 bot.sendMessage(chat_id=id, text=info_message)      # 봇이 시작될 때 출력
@@ -45,6 +54,10 @@ def handler(update, context):
     elif (user_text == "평균확진자"):    #평균 확진자수 '평균확진자'를 입력시 웹크롤링
         covid_avg = _avg()
         bot.send_message(chat_id=id, text = "7일 평균 확진자 수 : {} 명".format(covid_avg))
+
+    elif (user_text == "누적확진자"):
+        covid_total = _total()
+        bot.send_message(chat_id=id, text = "현재까지의 누적 확진자 수 : {} 명".format(covid_total))
 
 
 echo_handler = MessageHandler(Filters.text, handler)
