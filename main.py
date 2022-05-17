@@ -41,7 +41,8 @@ info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n'\
                '* 코로나  : 일일 코로나 확진자 수 \n' \
                '* 평균확진자  : 7일 평균 확진자 수 \n' \
                '* 누적확진자 : 현재까지의 누적 확진자 수\n' \
-               '* 코로나지침 : 최근 코로나 방역지침 *\n '
+               '* 코로나지침 : 최근 코로나 방역지침 *\n '\
+                '* 메뉴 : 생활 정보 알림이 명령어 다시 보기 *'
 
 bot.sendMessage(chat_id=id, text=info_message)      # 봇이 시작될 때 출력
 
@@ -66,6 +67,8 @@ def handler(update, context):
     elif (user_text == "코로나지침"):
         covid_man = _manual()
         bot.send_message(chat_id=id, text=covid_man)
+    elif (user_text == "메뉴"):
+        bot.sendMessage(chat_id=id, text=info_message)
 
 
 echo_handler = MessageHandler(Filters.text, handler)
