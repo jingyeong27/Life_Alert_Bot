@@ -79,18 +79,6 @@ def _jeju():
     info_jeju = soup.select_one('#main_maplayout > button:nth-child(17) > span:nth-child(2)')
     return info_jeju.string
 
-f = open("Clothes.txt","w")
-print("30°C~ : 나시티,반바지,민소매 원피스 \n "\
-"26°C~29°C : 반팔,반바지,면바지 \n "\
-"22°C~25°C : 얇은 가디건,긴팔티,면바지,슬랙스 \n"\
-"19°C~21°C : 긴팔,가디건,셔츠,얇은 자켓 \n "\
-"15°C~18°C : 니트,맨투맨,후드티,청바지 \n "\
-"11°C~14°C : 두꺼운 가디건,트렌치 코트,야상 \n "\
-"7°C~10°C : 히트텍,기모바지,가죽자켓,코트 \n "\
-"~6°C : 패딩,목도리,기모제품" , file=f)
-f.close()
-
-
 def _clothes():
     f = open('Clothes.txt', 'r')
     data = f.read()
