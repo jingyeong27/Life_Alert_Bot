@@ -79,6 +79,24 @@ def _jeju():
     info_jeju = soup.select_one('#main_maplayout > button:nth-child(17) > span:nth-child(2)')
     return info_jeju.string
 
+f = open("Clothes.txt","w")
+print("30°C~ : 나시티,반바지,민소매 원피스 \n "\
+"26°C~29°C : 반팔,반바지,면바지 \n "\
+"22°C~25°C : 얇은 가디건,긴팔티,면바지,슬랙스 \n"\
+"19°C~21°C : 긴팔,가디건,셔츠,얇은 자켓 \n "\
+"15°C~18°C : 니트,맨투맨,후드티,청바지 \n "\
+"11°C~14°C : 두꺼운 가디건,트렌치 코트,야상 \n "\
+"7°C~10°C : 히트텍,기모바지,가죽자켓,코트 \n "\
+"~6°C : 패딩,목도리,기모제품" , file=f)
+f.close()
+
+
+def _clothes():
+    f = open('Clothes.txt', 'r')
+    data = f.read()
+    return data
+
+city_comment="서울,대구,인천,부산,광주,울산,제주 중에서 \n알고 싶은 도시를 알려주세요"
 
 token = os.environ.get('token', "5396200298:AAEhrqPUg_VX5UoRzuImCNoyhDE_i4nLgKQ")  # 토큰 넣기
 id = 5054586086  # chat_id
@@ -89,7 +107,8 @@ info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n' \
                '* 코로나  : 일일 코로나 확진자 수 \n' \
                '* 평균확진자  : 7일 평균 확진자 수 \n' \
                '* 누적확진자 : 현재까지의 누적 확진자 수 \n' \
-               '* 도시별확진자 : 각 도시의 확진자 수'
+               '* 도시별확진자 : 각 도시의 확진자 수 \n'\
+               '* 기온별옷차림 : 기온 별로 적당한 옷차림 추천'
 
 bot.sendMessage(chat_id=id, text=info_message)  # 봇이 시작될 때 출력
 
@@ -113,7 +132,7 @@ def handler(update, context):
         bot.send_message(chat_id=id, text="현재까지의 누적 확진자 수 : {} 명".format(covid_total))
 
     elif (user_text == "도시별확진자"):
-        bot.send_message(chat_id=id, text="서울,대구,인천,부산,광주,울산,제주 중에서 \n알고 싶은 도시를 알려주세요")
+        bot.send_message(chat_id=id, text=city_comment)
 
     elif (user_text == "서울"):
         covid_seoul = _seoul()
@@ -143,7 +162,10 @@ def handler(update, context):
         covid_jeju = _jeju()
         bot.send_message(chat_id=id, text="제주의 누적 확진자 수: {} 명".format(covid_jeju))
 
+    elif (user_text == "기온별옷차림"):
+        temp_clothes = _clothes()
+        bot.send_message(chat_id=id, text=temp_clothes)
+
 
 echo_handler = MessageHandler(Filters.text, handler)
 dispatcher.add_handler(echo_handler)
-
