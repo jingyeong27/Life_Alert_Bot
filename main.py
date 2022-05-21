@@ -1,4 +1,7 @@
 import urllib.request as req
+from typing import List, Union
+
+import requests
 import telegram
 from telegram.ext import Updater
 from telegram.ext import MessageHandler, Filters
@@ -83,6 +86,25 @@ def _clothes():
     data = f.read()
     return data
 
+old_link=[]
+def _news(old_link=[]):
+    News_url = 'https://search.naver.com/search.naver?where=news&query=%EB%89%B4%EC%8A%A4&sm=tab_opt&sort=1&photo=0&field=0&pd=0&ds=&de=&docid=&related=0&mynews=0&office_type=0&office_section_code=0&news_office_checked=&nso=so%3Add%2Cp%3Aall&is_sug_officeid=0'
+    req = requests.get(News_url)
+    html = req.text
+    soup = BeautifulSoup(html,'html.parser')
+    total_search = soup.select_one('section.sc_new:nth-child(7) > div:nth-child(1)')
+    news_list = total_search.select('#sp_nws1 > div:nth-child(1) > div:nth-child(1) > a:nth-child(2)')
+
+    links = []
+    for news in news_list[:5]:
+        link = news['href']
+        links.append(link)
+    new_links = []
+    for link in links:
+        if link not in old_link:
+            new_links.append(link)
+    return new_links
+
 city_comment="서울,대구,인천,부산,광주,울산,제주 중에서 \n알고 싶은 도시를 알려주세요"
 
 token = os.environ.get('token', "5396200298:AAEhrqPUg_VX5UoRzuImCNoyhDE_i4nLgKQ")  # 토큰 넣기
@@ -96,7 +118,8 @@ info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n' \
                '* 누적확진자 : 현재까지의 누적 확진자 수 \n' \
                '* 도시별확진자 : 각 도시의 확진자 수 \n'\
                '* 기온별옷차림 : 기온별로 적당한 옷차림 추천 \n' \
-               '* 전국날씨 : 각 지역의 날씨 정보'
+               '* 전국날씨 : 각 지역의 날씨 정보 \n' \
+               '* 최신뉴스 : 가장 최근에 올라온 뉴스 확인'
 
 bot.sendMessage(chat_id=id, text=info_message)  # 봇이 시작될 때 출력
 
@@ -157,6 +180,9 @@ def handler(update, context):
     elif (user_text == "전국날씨"):
         bot.send_message(chat_id=id, text = "[전국의 날씨 정보(√클릭)](https://www.weather.go.kr/w/weather/forecast/short-term.do)",parse_mode='Markdown')
 
+    elif (user_text == "최신뉴스"):
+        recent_news = _news()
+        bot.send_message(chat_id=id, text=recent_news)
 
 echo_handler = MessageHandler(Filters.text, handler)
 dispatcher.add_handler(echo_handler)
