@@ -8,7 +8,6 @@ import os
 Corona_url = 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=11&ncvContSeq=&contSeq=&board_id=&gubun='
 Corona_url1 = 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13&ncvContSeq=&contSeq=&board_id=&gubun='
 
-
 def _day():
     code = req.urlopen(Corona_url)
     soup = BeautifulSoup(code, "html.parser")
@@ -96,7 +95,8 @@ info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n' \
                '* 평균확진자  : 7일 평균 확진자 수 \n' \
                '* 누적확진자 : 현재까지의 누적 확진자 수 \n' \
                '* 도시별확진자 : 각 도시의 확진자 수 \n'\
-               '* 기온별옷차림 : 기온 별로 적당한 옷차림 추천'
+               '* 기온별옷차림 : 기온별로 적당한 옷차림 추천 \n' \
+               '* 전국날씨 : 각 지역의 날씨 정보'
 
 bot.sendMessage(chat_id=id, text=info_message)  # 봇이 시작될 때 출력
 
@@ -153,6 +153,9 @@ def handler(update, context):
     elif (user_text == "기온별옷차림"):
         temp_clothes = _clothes()
         bot.send_message(chat_id=id, text=temp_clothes)
+
+    elif (user_text == "전국날씨"):
+        bot.send_message(chat_id=id, text = "[전국의 날씨 정보(√클릭)](https://www.weather.go.kr/w/weather/forecast/short-term.do)",parse_mode='Markdown')
 
 
 echo_handler = MessageHandler(Filters.text, handler)
