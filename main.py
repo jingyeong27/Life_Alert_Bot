@@ -1,5 +1,4 @@
 import urllib.request as req
-from typing import List, Union
 
 import requests
 import telegram
@@ -105,6 +104,9 @@ def _news(old_link=[]):
             new_links.append(link)
     return new_links
 
+def _unknown():
+    return('해당 명령은 존재하지 않습니다 😓')
+
 city_comment="서울,대구,인천,부산,광주,울산,제주 중에서 \n알고 싶은 도시를 알려주세요"
 
 token = os.environ.get('token', "5396200298:AAEhrqPUg_VX5UoRzuImCNoyhDE_i4nLgKQ")  # 토큰 넣기
@@ -183,6 +185,10 @@ def handler(update, context):
     elif (user_text == "최신뉴스"):
         recent_news = _news()
         bot.send_message(chat_id=id, text=recent_news)
+
+    else:
+        unknown_command = _unknown()
+        bot.send_message(chat_id=id, text=unknown_command)
 
 echo_handler = MessageHandler(Filters.text, handler)
 dispatcher.add_handler(echo_handler)
