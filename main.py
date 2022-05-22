@@ -10,24 +10,6 @@ Corona_url = 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=11&ncv
 Corona_url1= 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13&ncvContSeq=&contSeq=&board_id=&gubun='
 Wt = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=%EB%82%A0%EC%94%A8'
 
-def _day():
-    code = req.urlopen(Corona_url)
-    soup= BeautifulSoup(code, "html.parser")
-    info_day = soup.select("#content > div > div.caseTable > div:nth-child(4) > ul > li:nth-child(1) > dl > dd")
-    day_result = info_day[0].string
-    return day_result       # 일일 확진자수 결과를 return
-
-def _avg():
-    code_avg = req.urlopen(Corona_url)
-    soup = BeautifulSoup(code_avg, "html.parser")
-    info_avg = soup.select_one('#content > div > div:nth-child(14) > table > tbody > tr:nth-child(1) > td:nth-child(9)')
-    return info_avg.string      # 7일 평균 확진자수 결과를 return
-
-def _total():
-    code_total = req.urlopen(Corona_url1)
-    soup = BeautifulSoup(code_total, "html.parser")
-    info_total = soup.select_one('.total > li:nth-child(5) > div:nth-child(2) > span:nth-child(1)')
-    return info_total.string
 
 def _manual():
     f = open("Corona_manual.txt", 'r')
@@ -41,12 +23,10 @@ bot = telegram.Bot(token)
 
 info_message = '* 생활 정보 알림이에 오신 것을 환영합니다.\n'\
                '* 필요한 정보를 입력해주세요.\n'\
-               '* 코로나  : 일일 코로나 확진자 수 \n' \
-               '* 평균확진자  : 7일 평균 확진자 수 \n' \
-               '* 누적확진자 : 현재까지의 누적 확진자 수\n' \
-               '* 코로나지침 : 최근 코로나 방역지침 \n '\
-                '* 메뉴 : 생활 정보 알림이 명령어 다시 보기\n '\
-                '* 나의날씨 : 자신의 현재위치를 기반으로한 날씨 정보 '
+               '* 메뉴 : 생활 정보 알림이 명령어 다시 보기 🙏 \n' \
+               '* 코로나  : 일일 확진자, 7일 평균 확진자, 누적 확진자 수 ☠\n '\
+                '* 코로나지침 : 최근 코로나 방역지침 📖 \n '\
+                '* 나의날씨 : 자신의 현재위치를 기반으로한 날씨 정보 ☁  '
 
 bot.sendMessage(chat_id=id, text=info_message)      # 봇이 시작될 때 출력
 
@@ -57,22 +37,25 @@ updater.start_polling()
 def handler(update, context):
     user_text = update.message.text # 사용자가 보낸 메세지를 user_text 변수에 저장
     if (user_text == "코로나"):        #일일 확진자수 '코로나'를 입력시 웹크롤링
-        covid_num = _day()
-        bot.send_message(chat_id=id, text="오늘 확진자 수 : {} 명".format(covid_num))
-
-    elif (user_text == "평균확진자"):    #평균 확진자수 '평균확진자'를 입력시 웹크롤링
-        covid_avg = _avg()
-        bot.send_message(chat_id=id, text = "7일 평균 확진자 수 : {} 명".format(covid_avg))
-
-    elif (user_text == "누적확진자"):
-        covid_total = _total()
-        bot.send_message(chat_id=id, text = "현재까지의 누적 확진자 수 : {} 명".format(covid_total))
+        code = req.urlopen(Corona_url)
+        soup = BeautifulSoup(code, "html.parser")
+        info_day = soup.select_one("#content > div > div.caseTable > div:nth-child(4) > ul > li:nth-child(1) > dl > dd").string
+        re.sub('<[^<]+?>', '', info_day)
+        info_avg = soup.select_one('#content > div > div:nth-child(14) > table > tbody > tr:nth-child(1) > td:nth-child(9)').string
+        re.sub('<[^<]+?>', '', info_avg)
+        code1 = req.urlopen((Corona_url1))
+        soup = BeautifulSoup(code1, "html.parser")
+        info_total = soup.select_one('#mapAll > div > ul > li:nth-child(5) > div:nth-child(2) > span').string
+        re.sub('<[^<]+?>', '', info_total)
+        bot.send_message(chat_id=id, text="오늘 확진자 수 :"+ str(info_day) + " 명"+ "\n" + "7일 평균 확진자 수 : " + str(info_avg) + " 명"+ "\n"+ "현재 누적 확진자 수 :{} 명".format(info_total))
 
     elif (user_text == "코로나지침"):
         covid_man = _manual()
         bot.send_message(chat_id=id, text=covid_man)
+
     elif (user_text == "메뉴"):
         bot.sendMessage(chat_id=id, text=info_message)
+
     elif (user_text == "나의날씨"):
         code_mywt = req.urlopen(Wt)
         soup = BeautifulSoup(code_mywt, "html.parser")
